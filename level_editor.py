@@ -86,3 +86,55 @@ def draw_world():
 					#bush blocks
 					img = pygame.transform.scale(tiles[index-1], (tile_size, int(tile_size * 0.50)))
 					win.blit(img, (col * tile_size, row * tile_size + tile_size // 2))
+				if index == 15:
+					#lava blocks
+					img = pygame.transform.scale(tiles[index-1], (tile_size, int(tile_size * 0.50)))
+					win.blit(img, (col * tile_size, row * tile_size + tile_size // 2))
+				if index == 16:
+					#Lava Still block
+					img = pygame.transform.scale(tiles[index-1], (tile_size, tile_size))
+					win.blit(img, (col * tile_size, row * tile_size))
+				if index == 17:
+					#Diamond blocks
+					img = pygame.transform.scale(tiles[index-1], (tile_size, tile_size))
+					win.blit(img, (col * tile_size, row * tile_size))
+				if index == 18:
+					#Crate block
+					img = pygame.transform.scale(tiles[index-1], (tile_size, tile_size))
+					win.blit(img, (col * tile_size, row * tile_size))
+				if index == 19:
+					#Water blocks
+					img = pygame.transform.scale(tiles[index-1], (tile_size, int(tile_size * 0.50)))
+					win.blit(img, (col * tile_size, row * tile_size + tile_size // 2))
+				if index == 20:
+					#Water blocks
+					img = pygame.transform.scale(tiles[index-1], (tile_size, tile_size))
+					win.blit(img, (col * tile_size, row * tile_size))
+				if index == 21:
+					#tree blocks
+					img = pygame.transform.scale(tiles[index-1], (3*tile_size, 3 * tile_size))
+					win.blit(img, ((col-1) * tile_size + 10, (row-2) * tile_size + 5))
+				if index == 22:
+					#mushroom blocks
+					img = pygame.transform.scale(tiles[index-1], (int(tile_size * 0.80), int(tile_size * 0.80)))
+					win.blit(img, (col * tile_size + tile_size//8, row * tile_size + tile_size // 5))
+				if index == 23:
+					#Bee blocks
+					img = pygame.transform.scale(tiles[index-1], (50, 50))
+					win.blit(img, (col * tile_size, row * tile_size))
+				if index == 24:
+					#Bee blocks
+					img = tiles[index-1]
+					win.blit(img, (col * tile_size - tile_size//4, row * tile_size - tile_size//4))
+				if index == 27:
+					#flower blocks
+					img = pygame.transform.scale(tiles[index-1], (2*tile_size, tile_size))
+					win.blit(img, ((col) * tile_size, row * tile_size))
+				if index == 28:
+					#treelimb blocks
+					img = pygame.transform.scale(tiles[index-1], (5*tile_size + 20, tile_size))
+					win.blit(img, ((col-2) * tile_size + 10, row * tile_size + tile_size // 4))
+				if index == 29:
+					#slime blocks
+					img = pygame.transform.scale(tiles[index-1], (int(1.2*tile_size), tile_size))
+					win.blit(img, (col * tile_size - 10, row * tile_size))
