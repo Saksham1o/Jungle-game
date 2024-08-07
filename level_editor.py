@@ -239,3 +239,63 @@ while running:
 						r2 = [x,y]
 						rect = [r1, r2]
 
+
+        if event.type == KEYDOWN:
+			pos = rect[1]
+			if event.key == K_LEFT:
+				if pos[0] > 0:
+					pos[0] -= 1
+			elif event.key == K_RIGHT:
+				if pos[0] < cols-1:
+					pos[0] += 1
+			elif event.key == K_UP:
+				if pos[1] > 0:
+					pos[1] -= 1
+			elif event.key == K_DOWN:
+				if pos[1] < rows-1:
+					pos[1] += 1
+
+			rect[0] = pygame.Rect(pos[0]*tile_size, pos[1]*tile_size, tile_size, tile_size)
+			rect[1] = pos
+
+		if event.type == pygame.MOUSEBUTTONUP:
+			clicked = False
+
+	win.fill(BLUE)
+	win.blit(bg_img, (0,0))
+	win.blit(sun_img, (80,60))
+	draw_lines()
+	draw_world()
+	pygame.draw.rect(win, (255,0,0), rect[0], 3)
+
+	for tile in tile_group:
+		index = tile.update()
+		if index:
+			current_tile = index
+			r = rect[1]
+			world_data[r[1]][r[0]] = index
+
+	if save_button.draw():
+		#save level data
+		pickle_out = open(f'levels/level{current_level}_data', 'wb')
+		pickle.dump(world_data, pickle_out)
+		pickle_out.close()
+	if load_button.draw():
+		#load in level data
+		if os.path.exists(f'levels/level{current_level}_data'):
+			pickle_in = open(f'levels/level{current_level}_data', 'rb')
+			world_data = pickle.load(pickle_in)
+
+	if left_button.draw():
+		current_level -= 1
+		if current_level < 1:
+			current_level = 1
+	if right_button.draw():
+		current_level += 1
+
+	#text showing current level
+	draw_text(f'Level: {current_level}', font, WHITE, (WIDTH + 70, win_height - 25))
+
+	pygame.display.flip()
+
+pygame.quit()

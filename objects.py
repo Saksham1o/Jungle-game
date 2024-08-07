@@ -126,3 +126,105 @@ class World:
 		for tile in self.tile_list:
 			self.win.blit(tile[0], tile[1])
 
+
+
+# Creates Player
+class Player:
+	def __init__(self, win, pos, world, groups):
+		self.reset(win, pos, world, groups)
+
+	def update(self, pressed_keys, game_over, level_won, game_won):
+		dx = 0
+		dy = 0
+		walk_cooldown = 3
+		col_threshold = 20
+
+
+		if not game_over and not game_won:
+			if (pressed_keys[K_UP] or pressed_keys[K_SPACE]) and not self.jumped and not self.in_air:
+				self.vel_y = -15
+				jump_fx.play()
+				self.jumped = True
+			if (pressed_keys[K_UP] or pressed_keys[K_SPACE]) == False:
+				self.jumped = False
+			if pressed_keys[K_LEFT]:
+				dx -= 5
+				self.counter += 1
+				self.direction = -1
+			if pressed_keys[K_RIGHT]:
+				dx += 5
+				self.counter += 1
+				self.direction = 1
+
+			if pressed_keys[K_LEFT] == False and pressed_keys[K_RIGHT] == False:
+				self.counter = 0
+				self.index = 0
+				self.image = self.img_right[self.index]
+
+				if self.direction == 1:
+					self.image = self.img_right[self.index]
+				elif self.direction == -1:
+					self.image = self.img_left[self.index]
+
+			if self.counter > walk_cooldown:
+				self.counter = 0
+				self.index += 1
+				if self.index >= len(self.img_right):
+					self.index = 0
+
+				if self.direction == 1:
+					self.image = self.img_right[self.index]
+				elif self.direction == -1:
+					self.image = self.img_left[self.index]
+
+
+			# add gravity
+			self.vel_y += 1
+			if self.vel_y > 10:
+				self.vel_y = 10
+			dy += self.vel_y
+
+			# check for colision
+			self.in_air = True
+			for tile in self.world.tile_list:
+				# check for collision in x direction
+				if tile[1].colliderect(self.rect.x+dx, self.rect.y, self.width, self.height):
+					dx = 0
+
+				# check for collision in y direction
+				if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+					# check if below the ground
+					if self.vel_y < 0:
+						dy = tile[1].bottom - self.rect.top
+						self.vel_y = 0
+					elif self.vel_y >= 0:
+						dy = tile[1].top - self.rect.bottom
+						self.vel_y = 0
+						self.in_air = False
+
+			if pygame.sprite.spritecollide(self, self.groups[0], False):
+				game_over  = True
+			if pygame.sprite.spritecollide(self, self.groups[1], False):
+				game_over  = True
+			if pygame.sprite.spritecollide(self, self.groups[4], False):
+				game_over = True
+
+			for gate in self.groups[5]:
+				if gate.rect.colliderect(self.rect.x - tile_size//2, self.rect.y, self.width, self.height):
+					level_won = True
+
+			if game_over:
+				dead_fx.play()
+
+			# check for collision with moving platform
+			for platform in self.groups[6]:
+				# collision in x direction
+				if platform.rect.colliderect(self.rect.x+dx, self.rect.y, self.width, self.height):
+					dx = 0
+
+				# collision in y direction
+				if platform.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+					# check if below platform
+					if abs((self.rect.top + dy) - platform.rect.bottom) < col_threshold:
+						self.vel_y = 0
+						dy = (platform.rect.bottom - self.rect.top)
