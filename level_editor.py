@@ -204,3 +204,38 @@ right_button = Button((WIDTH + 140, HEIGHT - 35), right_img)
 
 initial_r = pygame.Rect(1*tile_size,1*tile_size,tile_size, tile_size)
 rect = [initial_r, [1,1]]
+
+
+running = True
+while running:
+	for event in pygame.event.get():
+		if event.type == QUIT:
+			running = False
+
+		if event.type == MOUSEBUTTONDOWN and clicked == False:
+			clicked = True
+			pos = pygame.mouse.get_pos()
+			if pos[0] <= WIDTH:
+				x = pos[0] // tile_size
+				y = pos[1] // tile_size
+				if pygame.mouse.get_pressed()[0]:
+					r = rect[1]
+					if r == [x,y]:
+						world_data[y][x] += 1
+						if world_data[y][x] >= len(tiles) + 1:
+							world_data[y][x] = 0
+					else:
+						r1 = pygame.Rect(x*tile_size, y*tile_size, tile_size, tile_size)
+						r2 = [x,y]
+						rect = [r1, r2]
+				elif pygame.mouse.get_pressed()[2]:
+					r = rect[1]
+					if r == [x,y]:
+						world_data[y][x] -= 1
+						if world_data[y][x] < 0:
+							world_data[y][x] = len(tiles)
+					else:
+						r1 = pygame.Rect(x*tile_size, y*tile_size, tile_size, tile_size)
+						r2 = [x,y]
+						rect = [r1, r2]
+

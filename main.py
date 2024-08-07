@@ -3,6 +3,8 @@ import random
 import pygame
 from pygame.locals import *
 
+from objects import World, Player, Button, draw_lines, load_level, draw_text, sounds
+
 SIZE = WIDTH , HEIGHT= 1000, 650
 tile_size = 50
 
@@ -24,6 +26,8 @@ you_won = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\im
 
 # loading level 1
 level = 1
+max_level = len(os.listdir('levels/'))
+data = load_level(level)
 
 player_pos = (10, 340)
 
@@ -48,3 +52,32 @@ home = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\
 exit = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\exit.png")
 setting = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\settings.png")
 
+
+play_btn = Button(play, (128, 64), WIDTH//2 - WIDTH // 16, HEIGHT//2)
+replay_btn  = Button(replay, (45,42), WIDTH//2 - 110, HEIGHT//2 + 20)
+home_btn  = Button(home, (45,42), WIDTH//2 - 20, HEIGHT//2 + 20)
+exit_btn  = Button(exit, (45,42), WIDTH//2 + 70, HEIGHT//2 + 20)
+
+
+# function to reset a level
+def reset_level(level):
+	global cur_score
+	cur_score = 0
+
+	data = load_level(level)
+	if data:
+		for group in groups:
+			group.empty()
+		world = World(win, data, groups)
+		player.reset(win, player_pos, world, groups)
+
+	return world
+
+score = 0
+cur_score = 0
+
+main_menu = True
+game_over = False
+level_won = False
+game_won = False
+running = True

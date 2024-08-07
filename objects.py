@@ -53,3 +53,76 @@ class World:
 						rect.y = row_count * tile_size
 						tile = (img, rect)
 						self.tile_list.append(tile)
+
+					if col == 14:
+						# bush
+						bush = Forest('bush',col_count * tile_size, row_count * tile_size + tile_size // 2)
+						self.groups[2].add(bush)
+
+					if col == 15:
+						# lava
+						lava = Fluid('lava_flow', col_count * tile_size, row_count * tile_size + tile_size // 2)
+						self.groups[1].add(lava)
+					if col == 16:
+						lava = Fluid('lava_still', col_count * tile_size, row_count * tile_size)
+						self.groups[1].add(lava)
+					
+					if col == 17:
+						# diamond
+						diamond = Diamond(col_count * tile_size, row_count * tile_size)
+						self.groups[3].add(diamond)
+					if col == 19:
+						# water block
+						water = Fluid('water_flow', col_count * tile_size, row_count * tile_size + tile_size // 2)
+						self.groups[1].add(water)
+					if col == 20:
+						# water block
+						water = Fluid('water_still', col_count * tile_size, row_count * tile_size)
+						self.groups[1].add(water)
+					if col == 21:
+						# tree
+						tree = Forest('tree', (col_count-1) * tile_size + 10, (row_count-2) * tile_size + 5)
+						self.groups[2].add(tree)
+					if col == 22:
+						# mushroom
+						mushroom = Forest('mushroom', col_count * tile_size, row_count * tile_size + tile_size // 4)
+						self.groups[2].add(mushroom)
+					if col == 23:
+						# bee
+						bee = Bee(col_count * tile_size, row_count * tile_size)
+						self.groups[4].add(bee)
+					if col == 24:
+						#Gate blocks
+						gate = ExitGate(col_count * tile_size - tile_size//4, row_count * tile_size - tile_size//4)
+						self.groups[5].add(gate)
+					if col == 25:
+						#Side moving platform
+						platform = MovingPlatform('side', col_count * tile_size, row_count * tile_size)
+						self.groups[6].add(platform)
+					if col == 26:
+						#top moving platform
+						platform = MovingPlatform('up', col_count * tile_size, row_count * tile_size)
+						self.groups[6].add(platform)
+					if col == 27:
+						#flower
+						flower = Forest('flower', (col_count) * tile_size, row_count * tile_size)
+						self.groups[2].add(flower)
+					if col == 28:
+						# bridge
+						bridge = Bridge((col_count-2) * tile_size + 10, row_count * tile_size + tile_size // 4)
+						self.groups[7].add(bridge)
+					if col == 29:
+						#Slime
+						slime = Slime(col_count * tile_size - 10, row_count * tile_size + tile_size // 4)
+						self.groups[4].add(slime)
+
+				col_count += 1
+			row_count += 1
+
+			diamond = Diamond((WIDTH//tile_size - 3) * tile_size, tile_size // 2)
+			self.groups[3].add(diamond)
+
+	def draw(self):
+		for tile in self.tile_list:
+			self.win.blit(tile[0], tile[1])
+
