@@ -138,3 +138,69 @@ def draw_world():
 					#slime blocks
 					img = pygame.transform.scale(tiles[index-1], (int(1.2*tile_size), tile_size))
 					win.blit(img, (col * tile_size - 10, row * tile_size))
+
+
+class Button:
+	def __init__(self, pos, image):
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.topleft = pos
+		self.clicked = False
+
+	def draw(self):
+		action = False
+
+		pos = pygame.mouse.get_pos()
+		if self.rect.collidepoint(pos):
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				action = True
+				self.clicked = True
+
+		if pygame.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		win.blit(self.image, self.rect)
+
+		return action
+
+class Tile():
+	def __init__(self, pos, image, index):
+		image = pygame.transform.scale(image, (40,40))
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.topleft = pos
+		self.clicked = False
+		self.index = index
+
+	def update(self):
+		action = False
+
+		pos = pygame.mouse.get_pos()
+		if self.rect.collidepoint(pos):
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				action = self.index
+				self.clicked = True
+
+		if pygame.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		win.blit(self.image, self.rect)
+
+		return action
+
+tile_group = []
+for index, tile in enumerate(tiles):
+	row = index // (margin // (40 + 5) )
+	column = index %  (margin // (40 + 5) )
+	pos = (WIDTH + 5 +(column * tile_size) + 5, 5 + row * tile_size + 5)
+	t = Tile(pos, tile, index+1)
+	tile_group.append(t)
+
+# create load and save buttons
+load_button = Button((WIDTH + 10, HEIGHT - 80), load_img)
+save_button = Button((WIDTH + 110, HEIGHT - 80), save_img)
+left_button = Button((WIDTH + 30, HEIGHT - 35), left_img)
+right_button = Button((WIDTH + 140, HEIGHT - 35), right_img)
+
+initial_r = pygame.Rect(1*tile_size,1*tile_size,tile_size, tile_size)
+rect = [initial_r, [1,1]]

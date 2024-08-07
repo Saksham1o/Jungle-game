@@ -39,3 +39,12 @@ platform_group = pygame.sprite.Group()
 bridge_group = pygame.sprite.Group()
 groups = [water_group, lava_group, forest_group, diamond_group, enemies_group, exit_group, platform_group,
 			bridge_group]
+
+
+# creating buttons
+play= pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\play.png")
+replay = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\replay.png")
+home = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\home.png")
+exit = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\exit.png")
+setting = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\settings.png")
+

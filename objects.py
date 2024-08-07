@@ -39,3 +39,17 @@ class World:
 		for t in sorted(os.listdir('tiles/'), key=lambda s: int(s[:-4])):
 			tile = pygame.image.load('tiles/' + t)
 			tiles.append(tile)
+
+		row_count = 0
+		for row in data:
+			col_count = 0
+			for col in row:
+				if col > 0:
+					if col in range(1,14) or col == 18:
+						# dirt blocks
+						img = pygame.transform.scale(tiles[col-1], (tile_size, tile_size))
+						rect = img.get_rect()
+						rect.x = col_count * tile_size
+						rect.y = row_count * tile_size
+						tile = (img, rect)
+						self.tile_list.append(tile)
