@@ -2,8 +2,8 @@ import os
 import random
 import pygame
 from pygame.locals import *
+from objects import *
 
-from objects import World, Player, Button, draw_lines, load_level, draw_text, sounds
 
 SIZE = WIDTH , HEIGHT= 1000, 650
 tile_size = 50
@@ -20,15 +20,14 @@ bg1 = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\B
 bg2 = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\BG2.png")
 bg = bg1
 sun = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\sun.png")
-jungle_dash = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\assets/jungle dash.png")
+jungle_dash = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\jungle dash.png")
 you_won = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\won.png")
 
 
 # loading level 1
 level = 1
-max_level = len(os.listdir('levels/'))
+max_level = len(os.listdir("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\levels"))
 data = load_level(level)
-
 player_pos = (10, 340)
 
 
@@ -44,13 +43,15 @@ bridge_group = pygame.sprite.Group()
 groups = [water_group, lava_group, forest_group, diamond_group, enemies_group, exit_group, platform_group,
 			bridge_group]
 
+world = World(win, data , groups)
+player = Player(win, groups,world)
 
 # creating buttons
 play= pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\play.png")
 replay = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\replay.png")
 home = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\home.png")
 exit = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\exit.png")
-setting = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\settings.png")
+setting = pygame.image.load("C:\\Users\\Saksham\\Desktop\\git28\\Jungle-game\\img\\setting.png")
 
 
 play_btn = Button(play, (128, 64), WIDTH//2 - WIDTH // 16, HEIGHT//2)
@@ -61,18 +62,27 @@ exit_btn  = Button(exit, (45,42), WIDTH//2 + 70, HEIGHT//2 + 20)
 
 # function to reset a level
 def reset_level(level):
-	global cur_score
-	cur_score = 0
+    global cur_score
+    cur_score = 0
 
-	data = load_level(level)
-	if data:
-		for group in groups:
-			group.empty()
-		world = World(win, data, groups)
-		player.reset(win, player_pos, world, groups)
+    data = load_level(level)
+    print(f"Loaded level data: {data}")
 
-	return world
+    if data is None or len(data) == 0:
+        print(f"Error: Unable to load level {level}. Level data is empty or None.")
+        return None  # Return None to indicate failure
 
+    # Clear existing groups
+    for group in groups:
+        group.empty()
+
+    # Create a new World instance
+    world = World(win, data, groups)
+
+    # Reset the player
+    player.reset(win, player_pos, world, groups)
+
+    return world
 score = 0
 cur_score = 0
 
@@ -88,10 +98,10 @@ while running:
 
 	pressed_keys = pygame.key.get_pressed()
 
+    
 	# displaying background & sun image
 	win.blit(bg, (0,0))
 	win.blit(sun, (40,40))
-	world.draw()
 	for group in groups:
 		group.draw(win)
 
@@ -104,3 +114,65 @@ while running:
 			game_over = False
 			game_won = False
 			score = 0
+		
+	else:
+		
+		if not game_over and not game_won:
+			
+			enemies_group.update(Player)
+			platform_group.update()
+			exit_group.update(Player)
+			if pygame.sprite.spritecollide(Player, diamond_group, True):
+				sounds[0].play()
+				cur_score += 1
+				score += 1	
+			draw_text(win, f'{score}', ((WIDTH//tile_size - 2) * tile_size, tile_size//2 + 10))
+			
+		game_over, level_won = Player.update(pressed_keys, game_over, level_won, game_won)
+
+		if game_over and not game_won:
+			replay = replay_btn.draw(win)
+			home = home_btn.draw(win)
+			exit = exit_btn.draw(win)
+
+			if replay:
+				score -= cur_score
+				world = reset_level(level)
+				game_over = False
+			if home:
+				game_over = True
+				main_menu = True
+				bg = bg1
+				level = 1
+				world = reset_level(level)
+			if exit:
+				running = False
+
+		if level_won:
+			if level <= max_level:
+				level += 1
+				game_level = f'levels/level{level}_data'
+				if os.path.exists(game_level):
+					data = []
+					world = reset_level(level)
+					level_won = False
+					score += cur_score
+
+				bg = random.choice([bg1, bg2])
+			else:
+				game_won = True
+				bg = bg1
+				win.blit(you_won, (WIDTH//4, HEIGHT // 4))
+				home = home_btn.draw(win)
+
+				if home:
+					game_over = True
+					main_menu = True
+					level_won = False
+					level = 1
+					world = reset_level(level)
+
+	pygame.display.flip()
+	clock.tick(FPS)
+
+pygame.quit()
