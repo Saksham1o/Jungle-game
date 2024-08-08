@@ -81,3 +81,26 @@ game_over = False
 level_won = False
 game_won = False
 running = True
+while running:
+	for event in pygame.event.get():
+		if event.type == QUIT:
+			running = False
+
+	pressed_keys = pygame.key.get_pressed()
+
+	# displaying background & sun image
+	win.blit(bg, (0,0))
+	win.blit(sun, (40,40))
+	world.draw()
+	for group in groups:
+		group.draw(win)
+
+	if main_menu:
+		win.blit(jungle_dash, (WIDTH//2 - WIDTH//8, HEIGHT//4))
+
+		play_game = play_btn.draw(win)
+		if play_game:
+			main_menu = False
+			game_over = False
+			game_won = False
+			score = 0

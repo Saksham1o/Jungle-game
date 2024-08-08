@@ -228,3 +228,148 @@ class Player:
 					if abs((self.rect.top + dy) - platform.rect.bottom) < col_threshold:
 						self.vel_y = 0
 						dy = (platform.rect.bottom - self.rect.top)
+
+					# check if above platform
+					elif abs((self.rect.bottom + dy) - platform.rect.top) < col_threshold:
+						self.rect.bottom = platform.rect.top - 1
+						self.in_air = False
+						dy = 0
+					# move sideways with the platform
+					if platform.move_x:
+						self.rect.x += platform.move_direction
+
+			for bridge in self.groups[7]:
+				# collision in x direction
+				if ( bridge.rect.colliderect(self.rect.x+dx, self.rect.y, self.width, self.height) and 
+							( bridge.rect.bottom < self.rect.bottom + 5)):
+					dx = 0
+
+				
+				if bridge.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+					if abs((self.rect.top + dy) - bridge.rect.bottom) < col_threshold:
+						self.vel_y = 0
+						dy = (bridge.rect.bottom - self.rect.top)
+
+					
+					elif abs((self.rect.bottom + dy) - bridge.rect.bottom) < 8:
+						self.rect.bottom = bridge.rect.bottom - 12
+						self.in_air = False
+						dy = 0
+
+
+
+
+			# updating player position
+			self.rect.x += dx
+			self.rect.y += dy
+			# if self.rect.x == self.width:
+			# 	self.rect.x = self.width
+			if self.rect.x >= WIDTH - self.width:
+				self.rect.x = WIDTH - self.width
+			if self.rect.x <= 0:
+				self.rect.x = 0
+
+
+		elif game_over:
+			self.image = dead_img
+			if self.rect.top > 0:
+				self.rect.y -= 5
+
+			self.win.blit(game_over_img, game_over_rect)
+
+		# displaying player on window
+		self.win.blit(self.image, self.rect)
+		# pygame.draw.rect(self.win, (255, 255, 255), self.rect, 1)
+	
+		return game_over, level_won
+
+	def reset(self, win, pos, world, groups):
+		x, y  = pos
+		self.win = win
+		self.world = world
+		self.groups = groups
+
+		self.img_right = []
+		self.img_left = []
+		self.index = 0
+		self.counter = 0
+
+		for i in range(6):
+			img = pygame.image.load(f'player/walk{i+1}.png')
+			img_right = pygame.transform.scale(img, (45,70))
+			img_left = pygame.transform.flip(img_right, True, False)
+			self.img_right.append(img_right)
+			self.img_left.append(img_left)
+
+		self.image = self.img_right[self.index]
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+		self.width = self.image.get_width()
+		self.height = self.image.get_height()
+		self.direction = 1
+		self.vel_y = 0
+		self.jumping = False
+		self.in_air = True
+
+class MovingPlatform(pygame.sprite.Sprite):
+	def __init__(self, type_, x, y):
+		super(MovingPlatform, self).__init__()
+
+		img = pygame.image.load('assets/moving.png')
+		self.image = pygame.transform.scale(img, (tile_size, tile_size // 2))
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+		direction = random.choice([-1,1])
+		self.move_direction = direction
+		self.move_counter = 0
+		self.move_x = 0
+		self.move_y = 0
+
+		if type_ == 'side':
+			self.move_x = 1
+		elif type_ == 'up':
+			self.move_y = 1
+
+	def update(self):
+		self.rect.x += self.move_direction * self.move_x
+		self.rect.y += self.move_direction * self.move_y
+		self.move_counter += 1
+		if abs(self.move_counter) >= 50:
+			self.move_direction *= -1
+			self.move_counter *= -1
+
+class Bridge(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		super(Bridge, self).__init__()
+
+		img = pygame.image.load('tiles/28.png')
+		self.image = pygame.transform.scale(img, (5*tile_size + 20, tile_size))
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+
+class Fluid(pygame.sprite.Sprite):
+	def __init__(self, type_, x, y):
+		super(Fluid, self).__init__()
+
+		if type_ == 'water_flow':
+			img = pygame.image.load('tiles/19.png')
+			self.image = pygame.transform.scale(img, (tile_size, tile_size // 2 + tile_size // 4))
+		if type_ == 'water_still':
+			img = pygame.image.load('tiles/20.png')
+			self.image = pygame.transform.scale(img, (tile_size, tile_size))
+		elif type_ == 'lava_flow':
+			img = pygame.image.load('tiles/15.png')
+			self.image = pygame.transform.scale(img, (tile_size, tile_size // 2 + tile_size // 4))
+		elif type_ == 'lava_still':
+			img = pygame.image.load('tiles/16.png')
+			self.image = pygame.transform.scale(img, (tile_size, tile_size))
+
+		
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
